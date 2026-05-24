@@ -1,0 +1,16 @@
+# Ignorar ejecutables compilados gigantes y logs de decompilacion
+generador_cli.exe
+generador_cli.exe_extracted/
+generador_dis_utf8.txt
+generador_dis.txt
+pycdc/
+extractor_categorias.py
+constants.txt
+pyinstxtractor.py
+build/
+dist/
+__pycache__/
+
+# Podemos subir generador2026.exe o no, si queremos el ejecutable,
+# pero normalmente se ignoran:
+# *.exe
