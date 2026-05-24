@@ -202,19 +202,25 @@ def create_excel_table_final(pdf_path):
     # ---------------------------------------------------------
     ws_resumen = wb.create_sheet("Resumen por Categoria")
     
-    # ¡AQUÍ ESTÁ LA LISTA DE CATEGORÍAS PARA EDITAR!
-    # Puedes agregar nuevas palabras clave en la lista de cada categoría
+    # Categorías EXACTAS solicitadas
     reglas_categorias = {
-        'IMPUESTO DEB/CRED': ['gravamenley25413sdeb', 'gravamenley25413scred'],
+        'IMPUESTOS DEB/CRED': ['gravamenley25413sdeb', 'gravamenley25413scred'],
         'IVA DEBITO': ['ivabase'],
         'COMISIONES Y GASTOS': ['comispservrecaudacion', 'comispserv', 'comis', 'serv', 'comistransfne24'],
-        'DEB.TRAN.INTERB-LINK TIT': ['debtraninterblinktit'],
         'INTERDEPOSITOS': ['interdepositos', 'crtrasfinterbaneres'],
         'DEPOSITOS': ['deposito', 'depositos']
     }
 
-    resumen_totales = {cat: {'debitos': 0, 'creditos': 0, 'cantidad': 0} for cat in reglas_categorias.keys()}
-    resumen_totales['OTROS'] = {'debitos': 0, 'creditos': 0, 'cantidad': 0}
+    # Mantener el orden exacto solicitado
+    orden_categorias = [
+        'IMPUESTOS DEB/CRED',
+        'IVA DEBITO',
+        'COMISIONES Y GASTOS',
+        'INTERDEPOSITOS',
+        'DEPOSITOS'
+    ]
+
+    resumen_totales = {cat: {'debitos': 0, 'creditos': 0, 'cantidad': 0} for cat in orden_categorias}
 
     for t in transactions:
         detalle = t['DETALLE'] or ""
@@ -222,20 +228,12 @@ def create_excel_table_final(pdf_path):
         debito = float(t['DEBITOS'])
         credito = float(t['CREDITOS'])
         
-        categorizado = False
-        
         for categoria, palabras_clave in reglas_categorias.items():
             if any(palabra in detalle_norm for palabra in palabras_clave):
                 resumen_totales[categoria]['debitos'] += debito
                 resumen_totales[categoria]['creditos'] += credito
                 resumen_totales[categoria]['cantidad'] += 1
-                categorizado = True
                 break
-                
-        if not categorizado:
-            resumen_totales['OTROS']['debitos'] += debito
-            resumen_totales['OTROS']['creditos'] += credito
-            resumen_totales['OTROS']['cantidad'] += 1
 
     headers_resumen = ['CATEGORIA', 'CANTIDAD', 'TOTAL DEBITOS', 'TOTAL CREDITOS', 'SALDO NETO']
     ws_resumen.append(headers_resumen)
@@ -246,11 +244,11 @@ def create_excel_table_final(pdf_path):
         cell.alignment = Alignment(horizontal="center")
 
     row_idx = 2
-    for cat, tot in resumen_totales.items():
-        if tot['cantidad'] > 0:
-            saldo_neto = tot['creditos'] - tot['debitos']
-            ws_resumen.append([cat, tot['cantidad'], tot['debitos'], tot['creditos'], saldo_neto])
-            row_idx += 1
+    for cat in orden_categorias:
+        tot = resumen_totales[cat]
+        saldo_neto = tot['creditos'] - tot['debitos']
+        ws_resumen.append([cat, tot['cantidad'], tot['debitos'], tot['creditos'], saldo_neto])
+        row_idx += 1
             
     tab_res = Table(displayName="ResumenCategoria", ref=f"A1:E{row_idx-1}")
     tab_res.tableStyleInfo = style
