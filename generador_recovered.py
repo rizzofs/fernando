@@ -202,13 +202,21 @@ def create_excel_table_final(pdf_path):
     # ---------------------------------------------------------
     ws_resumen = wb.create_sheet("Resumen por Categoria")
     
-    # Categorías EXACTAS solicitadas
+    # Categorías EXACTAS solicitadas y recuperadas del código original
     reglas_categorias = {
         'IMPUESTOS DEB/CRED': ['gravamenley25413sdeb', 'gravamenley25413scred'],
         'IVA DEBITO': ['ivabase'],
-        'COMISIONES Y GASTOS': ['comispservrecaudacion', 'comispserv', 'comis', 'serv', 'comistransfne24'],
-        'INTERDEPOSITOS': ['interdepositos', 'crtrasfinterbaneres'],
-        'DEPOSITOS': ['deposito', 'depositos']
+        'COMISIONES Y GASTOS': ['comispservrecaudacion', 'comispserv', 'comis', 'serv', 'comistransfne24', 'comiscompensacionatenc'],
+        'INTERDEPOSITOS': [
+            'debtraninterblink', 'debtraninterblinkres', 'pagovepafip', 'pagoedensa', 
+            'dbcredintranslinkcia', 'debitopagodirecto', 'pagomovistar', 'pagomovistarhogar', 
+            'pagocajademedaportp', 'pagofaecys'
+        ],
+        'DEPOSITOS': [
+            'debtraninterblinktit', 'rendpservrecaudacion', 'transfintdistlinklar', 
+            'cbetrobcodsuc0001k', 'rendicionpagoslink', 'debin', 'transfintdistbanelar', 
+            'crtrvariosvsuc0001', 'crtransfinterlinkres', 'dep', 'deposito', 'efectivo', 'ch'
+        ]
     }
 
     # Mantener el orden exacto solicitado
