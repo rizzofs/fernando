@@ -211,13 +211,13 @@ def create_excel_table_final(pdf_path):
         'INTERDEPOSITOS': [
             'debtraninterblink', 'debtraninterblinkres', 'pagovepafip', 'pagoedensa', 
             'dbcredintranslinkcia', 'debitopagodirecto', 'pagomovistar', 'pagomovistarhogar', 
-            'pagocajademedaportp', 'pagofaecys'
+            'pagocajademedaportp', 'pagofaecys', '48hsbancos'
         ],
         'DEPOSITOS': [
             'debtraninterblinktit', 'rendpservrecaudacion', 'transfintdistlinklar', 
             'cbetrobcodsuc0001k', 'rendicionpagoslink', 'debin', 'transfintdistbanelar', 
             'crtrvariosvsuc0001', 'crtransfinterlinkres', 'dep', 'deposito', 'efectivo', 'ch',
-            'transfintermmlinkular', 'camfeddistpzaobcos', '48hsbancos', 'crtransfinterbaneres',
+            'transfintermmlinkular', 'camfeddistpzaobcos', 'crtransfinterbaneres',
             'creditosvarios', 'cobradoporcaja', 'crtrfacturasuc0001'
         ]
     }
