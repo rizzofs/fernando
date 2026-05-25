@@ -266,6 +266,59 @@ def create_excel_table_final(pdf_path):
     tab_res.tableStyleInfo = style
     ws_resumen.add_table(tab_res)
 
+    # ---------------------------------------------------------
+    # HOJA 4: Detalle por Categoria
+    # ---------------------------------------------------------
+    ws_detalle_cat = wb.create_sheet("Detalle por Categoria")
+    
+    detalle_por_categoria = {cat: {} for cat in orden_categorias}
+    detalle_por_categoria['NO CATEGORIZADAS'] = {}
+
+    for t in transactions:
+        detalle = t['DETALLE'] or ""
+        detalle_norm = re.sub(r'[^a-z0-9]', '', detalle.lower())
+        debito = float(t['DEBITOS'])
+        credito = float(t['CREDITOS'])
+        
+        cat_asignada = 'NO CATEGORIZADAS'
+        for categoria, palabras_clave in reglas_categorias.items():
+            if any(palabra in detalle_norm for palabra in palabras_clave):
+                cat_asignada = categoria
+                break
+                
+        if detalle not in detalle_por_categoria[cat_asignada]:
+            detalle_por_categoria[cat_asignada][detalle] = {'debitos': 0, 'creditos': 0, 'cantidad': 0}
+            
+        detalle_por_categoria[cat_asignada][detalle]['debitos'] += debito
+        detalle_por_categoria[cat_asignada][detalle]['creditos'] += credito
+        detalle_por_categoria[cat_asignada][detalle]['cantidad'] += 1
+
+    headers_det_cat = ['CATEGORIA', 'DETALLE', 'CANTIDAD', 'TOTAL DEBITOS', 'TOTAL CREDITOS', 'SALDO NETO']
+    ws_detalle_cat.append(headers_det_cat)
+    
+    for col_num, cell in enumerate(ws_detalle_cat[1], 1):
+        cell.font = header_font
+        cell.fill = header_fill
+        cell.alignment = Alignment(horizontal="center")
+
+    row_idx_det = 2
+    
+    for cat in orden_categorias + ['NO CATEGORIZADAS']:
+        if not detalle_por_categoria[cat]:
+            continue
+            
+        # Ordenar por Saldo Neto de mayor a menor
+        items_ordenados = sorted(detalle_por_categoria[cat].items(), key=lambda x: (x[1]['creditos'] - x[1]['debitos']), reverse=True)
+        
+        for det, tot in items_ordenados:
+            saldo_neto = tot['creditos'] - tot['debitos']
+            ws_detalle_cat.append([cat, det, tot['cantidad'], tot['debitos'], tot['creditos'], saldo_neto])
+            row_idx_det += 1
+            
+    tab_det_cat = Table(displayName="DetalleCategoria", ref=f"A1:F{row_idx_det-1}")
+    tab_det_cat.tableStyleInfo = style
+    ws_detalle_cat.add_table(tab_det_cat)
+
     # Save
     base_name = os.path.splitext(os.path.basename(pdf_path))[0]
     out_filename = f"estado_cuenta_final_{account}_{base_name}.xlsx"
