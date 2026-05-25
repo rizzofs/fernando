@@ -204,7 +204,7 @@ def create_excel_table_final(pdf_path):
     
     # Categorías EXACTAS solicitadas y recuperadas del código original
     reglas_categorias = {
-        'IMPUESTOS DEB/CRED': ['gravamenley25413sdeb', 'gravamenley25413scred'],
+        'IMPUESTOS DEB/CRED': ['gravamenley25413sdeb', 'gravamenley25413scred', 'reintegroley25413deb', 'reintegroley25413cred', 'vsgytley25413'],
         'IVA DEBITO': ['ivabase'],
         'COMISIONES Y GASTOS': ['comispservrecaudacion', 'comispserv', 'comis', 'serv', 'comistransfne24', 'comiscompensacionatenc'],
         'INTERDEPOSITOS': [
@@ -215,7 +215,9 @@ def create_excel_table_final(pdf_path):
         'DEPOSITOS': [
             'debtraninterblinktit', 'rendpservrecaudacion', 'transfintdistlinklar', 
             'cbetrobcodsuc0001k', 'rendicionpagoslink', 'debin', 'transfintdistbanelar', 
-            'crtrvariosvsuc0001', 'crtransfinterlinkres', 'dep', 'deposito', 'efectivo', 'ch'
+            'crtrvariosvsuc0001', 'crtransfinterlinkres', 'dep', 'deposito', 'efectivo', 'ch',
+            'transfintermmlinkular', 'camfeddistpzaobcos', '48hsbancos', 'crtransfinterbaneres',
+            'creditosvarios', 'cobradoporcaja', 'crtrfacturasuc0001'
         ]
     }
 
