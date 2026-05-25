@@ -206,7 +206,8 @@ def create_excel_table_final(pdf_path):
     reglas_categorias = {
         'IMPUESTOS DEB/CRED': ['gravamenley25413sdeb', 'gravamenley25413scred', 'reintegroley25413deb', 'reintegroley25413cred', 'vsgytley25413'],
         'IVA DEBITO': ['ivabase'],
-        'COMISIONES Y GASTOS': ['comispservrecaudacion', 'comispserv', 'comis', 'serv', 'comistransfne24', 'comiscompensacionatenc'],
+        'COMISIONES Y GASTOS': ['comispservrecaudacion', 'comispserv', 'comistransfne24', 'comiscompensacionatenc', 'comiscanjeobancos'],
+        'CHEQUES DEBITADOS': ['pagochequepropiacasa'],
         'INTERDEPOSITOS': [
             'debtraninterblink', 'debtraninterblinkres', 'pagovepafip', 'pagoedensa', 
             'dbcredintranslinkcia', 'debitopagodirecto', 'pagomovistar', 'pagomovistarhogar', 
@@ -226,6 +227,7 @@ def create_excel_table_final(pdf_path):
         'IMPUESTOS DEB/CRED',
         'IVA DEBITO',
         'COMISIONES Y GASTOS',
+        'CHEQUES DEBITADOS',
         'INTERDEPOSITOS',
         'DEPOSITOS'
     ]
