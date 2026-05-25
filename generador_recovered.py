@@ -128,10 +128,34 @@ def create_excel_table_final(pdf_path):
     account = extract_account_number(pdf_path) or "Cuenta_Desconocida"
     print(f"\nNúmero de cuenta detectado: {account}")
 
+    # NEW LOGIC: Type and Period
+    if "2341052324" in account:
+        tipo = "Cobros"
+    elif "2341055145" in account:
+        tipo = "Pagos"
+    else:
+        tipo = "Desconocido"
+        
+    fechas = [t['FECHA'] for t in transactions if t.get('FECHA')]
+    if fechas:
+        periodo = f"{fechas[0]} al {fechas[-1]}"
+    else:
+        periodo = "Desconocido"
+
+    def write_header(ws):
+        ws.append([f"Cuenta: {account}"])
+        ws.append([f"Tipo: {tipo}"])
+        ws.append([f"Período: {periodo}"])
+        ws.append([]) # Fila vacía
+        ws['A1'].font = Font(bold=True)
+        ws['A2'].font = Font(bold=True)
+        ws['A3'].font = Font(bold=True)
+
     wb = openpyxl.Workbook()
     ws = wb.active
     ws.title = "Estado de Cuenta"
     
+    write_header(ws)
     headers = ['FECHA', 'DETALLE', 'COMPROB.', 'DEBITOS', 'CREDITOS', 'SALDO']
     ws.append(headers)
     
@@ -142,13 +166,13 @@ def create_excel_table_final(pdf_path):
     header_font = Font(bold=True, color="FFFFFF")
     header_fill = PatternFill(start_color="366092", end_color="366092", fill_type="solid")
     
-    for col_num, cell in enumerate(ws[1], 1):
+    for col_num, cell in enumerate(ws[5], 1):
         cell.font = header_font
         cell.fill = header_fill
         cell.alignment = Alignment(horizontal="center")
         
     # Table logic
-    tab = Table(displayName="EstadoCuenta", ref=f"A1:F{len(transactions)+1}")
+    tab = Table(displayName="EstadoCuenta", ref=f"A5:F{len(transactions)+5}")
     style = TableStyleInfo(name="TableStyleMedium2", showFirstColumn=False,
                            showLastColumn=False, showRowStripes=True, showColumnStripes=True)
     tab.tableStyleInfo = style
@@ -181,19 +205,20 @@ def create_excel_table_final(pdf_path):
 
     totales_ordenados = sorted(totales_por_detalle.items(), key=lambda x: x[1]['cantidad'], reverse=True)
     
+    write_header(ws_totales)
     headers_totales = ['DETALLE', 'CANTIDAD', 'TOTAL DEBITOS', 'TOTAL CREDITOS', 'SALDO NETO']
     ws_totales.append(headers_totales)
     
-    for col_num, cell in enumerate(ws_totales[1], 1):
+    for col_num, cell in enumerate(ws_totales[5], 1):
         cell.font = header_font
         cell.fill = header_fill
         cell.alignment = Alignment(horizontal="center")
 
-    for i, (det, tot) in enumerate(totales_ordenados, 2):
+    for i, (det, tot) in enumerate(totales_ordenados, 6):
         saldo_neto = tot['creditos'] - tot['debitos']
         ws_totales.append([det, tot['cantidad'], tot['debitos'], tot['creditos'], saldo_neto])
         
-    tab_tot = Table(displayName="TotalesDetalle", ref=f"A1:E{len(totales_ordenados)+1}")
+    tab_tot = Table(displayName="TotalesDetalle", ref=f"A5:E{len(totales_ordenados)+5}")
     tab_tot.tableStyleInfo = style
     ws_totales.add_table(tab_tot)
 
@@ -247,22 +272,23 @@ def create_excel_table_final(pdf_path):
                 resumen_totales[categoria]['cantidad'] += 1
                 break
 
+    write_header(ws_resumen)
     headers_resumen = ['CATEGORIA', 'CANTIDAD', 'TOTAL DEBITOS', 'TOTAL CREDITOS', 'SALDO NETO']
     ws_resumen.append(headers_resumen)
     
-    for col_num, cell in enumerate(ws_resumen[1], 1):
+    for col_num, cell in enumerate(ws_resumen[5], 1):
         cell.font = header_font
         cell.fill = header_fill
         cell.alignment = Alignment(horizontal="center")
 
-    row_idx = 2
+    row_idx = 6
     for cat in orden_categorias:
         tot = resumen_totales[cat]
         saldo_neto = tot['creditos'] - tot['debitos']
         ws_resumen.append([cat, tot['cantidad'], tot['debitos'], tot['creditos'], saldo_neto])
         row_idx += 1
             
-    tab_res = Table(displayName="ResumenCategoria", ref=f"A1:E{row_idx-1}")
+    tab_res = Table(displayName="ResumenCategoria", ref=f"A5:E{row_idx-1}")
     tab_res.tableStyleInfo = style
     ws_resumen.add_table(tab_res)
 
@@ -293,15 +319,16 @@ def create_excel_table_final(pdf_path):
         detalle_por_categoria[cat_asignada][detalle]['creditos'] += credito
         detalle_por_categoria[cat_asignada][detalle]['cantidad'] += 1
 
+    write_header(ws_detalle_cat)
     headers_det_cat = ['CATEGORIA', 'DETALLE', 'CANTIDAD', 'TOTAL DEBITOS', 'TOTAL CREDITOS', 'SALDO NETO']
     ws_detalle_cat.append(headers_det_cat)
     
-    for col_num, cell in enumerate(ws_detalle_cat[1], 1):
+    for col_num, cell in enumerate(ws_detalle_cat[5], 1):
         cell.font = header_font
         cell.fill = header_fill
         cell.alignment = Alignment(horizontal="center")
 
-    row_idx_det = 2
+    row_idx_det = 6
     
     for cat in orden_categorias + ['NO CATEGORIZADAS']:
         if not detalle_por_categoria[cat]:
@@ -315,7 +342,7 @@ def create_excel_table_final(pdf_path):
             ws_detalle_cat.append([cat, det, tot['cantidad'], tot['debitos'], tot['creditos'], saldo_neto])
             row_idx_det += 1
             
-    tab_det_cat = Table(displayName="DetalleCategoria", ref=f"A1:F{row_idx_det-1}")
+    tab_det_cat = Table(displayName="DetalleCategoria", ref=f"A5:F{row_idx_det-1}")
     tab_det_cat.tableStyleInfo = style
     ws_detalle_cat.add_table(tab_det_cat)
 
